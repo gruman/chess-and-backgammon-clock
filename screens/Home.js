@@ -9,7 +9,7 @@ import fontColorContrast from 'font-color-contrast'
 const ChessClock = ({ navigation }) => {
 
   // Extracting state and functions from custom context
-  const { theme, setTheme, updateScore, score1, setScore1, setScore2, score2 } = useCustomContext();
+  const { theme, dice, updateScore, score1, setScore1, setScore2, score2 } = useCustomContext();
 
   // Hook to check if the screen is currently focused
   const isVisible = useIsFocused();
@@ -18,7 +18,8 @@ const ChessClock = ({ navigation }) => {
   const [player1Time, setPlayer1Time] = useState(120);
   const [player2Time, setPlayer2Time] = useState(120);
   const [currentPlayer, setCurrentPlayer] = useState(0);
-  const [paused, setPaused] = useState(true);
+  const [paused, setPaused] = useState(false);
+  const [roll, setRoll] = useState([6, 6])
 
   // Alert game over when either player's time reaches 0
   useEffect(() => {
@@ -52,9 +53,16 @@ const ChessClock = ({ navigation }) => {
     const formattedSeconds = String(remainingSeconds).padStart(2, '0'); // Ensure two-digit formatting
     return `${minutes}:${formattedSeconds}`;
   }
-
+  function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
+  }
   // Function to toggle between players and start the clock
   function togglePlayers(id) {
+    const dice1 = getRandomInt(1, 7);
+    const dice2 = getRandomInt(1, 7);
+    setRoll([dice1, dice2]);
     setPaused(false)
     setCurrentPlayer(id)
   }
@@ -72,7 +80,7 @@ const ChessClock = ({ navigation }) => {
 
   // Function to reset the game
   function resetGame() {
-    setPaused(true);
+    setPaused(false);
     setPlayer1Time(theme.time)
     setPlayer2Time(theme.time)
     setScore1(0);
@@ -86,6 +94,18 @@ const ChessClock = ({ navigation }) => {
       <View style={[styles.button, { backgroundColor: theme.colors, opacity: currentPlayer === 1 ? 0.9 : 1 }]}>
         <Pressable disabled={currentPlayer === 2} onPress={() => currentPlayer == 0 ? togglePlayers(1) : togglePlayers(2)} style={{ flex: 1 }}>
           <View style={[styles.surface]}>
+          {
+              dice && currentPlayer === 1 &&
+             <View style={styles.diceHolder}>
+              <View style={[styles.dice, { borderColor: fontColorContrast(theme.colors) }]}>
+                <Text style={[styles.diceText,styles.reverseText, { color: fontColorContrast(theme.colors) }]}>{roll[0]}</Text>
+              </View>
+
+              <View style={[styles.dice, { borderColor: fontColorContrast(theme.colors) }]}>
+                 <Text style={[styles.diceText,styles.reverseText, { color: fontColorContrast(theme.colors) }]}>{roll[1]}</Text>
+              </View>
+            </View>
+}
             <Text style={[styles.reverseText, styles.clock, { color: fontColorContrast(theme.colors) }]}>{formatTime(player1Time)}</Text>
           </View>
         </Pressable>
@@ -100,16 +120,22 @@ const ChessClock = ({ navigation }) => {
           </Pressable>
 
           {/* Buttons for pause/reset or navigate to settings/reset based on the current player */}
-          {currentPlayer !== 0 ?
-            <>
-              <Button style={{ marginRight: 10 }} onPress={() => pause()} title="Pause" />
-              <Button style={{ marginLeft: 10 }} onPress={() => resetGame()} title="Reset" />
-            </>
-            :
-            <>
-              <Button style={{ marginLeft: 10 }} onPress={() => navigation.navigate('Settings')} title="Settings" />
-              <Button style={{ marginLeft: 10 }} onPress={() => resetGame()} title="Reset" />
-            </>
+          {
+            paused ?
+              <>
+                <Button style={{ marginRight: 10 }} onPress={() => pause()} title="Pause" />
+                <Button style={{ marginLeft: 10 }} onPress={() => resetGame()} title="Reset" />
+              </>
+              :
+              currentPlayer !== 0 ?
+                <>
+                  <Button style={{ marginRight: 10 }} onPress={() => pause()} title="Pause" />
+                </>
+                :
+                <>
+                  <Button style={{ marginLeft: 10 }} onPress={() => navigation.navigate('Settings')} title="Settings" />
+                  <Button style={{ marginLeft: 10 }} onPress={() => resetGame()} title="Reset" />
+                </>
           }
 
           {/* Player 1 score button */}
@@ -123,6 +149,19 @@ const ChessClock = ({ navigation }) => {
       <View style={[styles.button, { backgroundColor: theme.colors2, opacity: currentPlayer === 2 ? 0.9 : 1 }]}>
         <Pressable disabled={currentPlayer === 1} onPress={() => currentPlayer == 0 ? togglePlayers(2) : togglePlayers(1)} style={{ flex: 1 }}>
           <View style={[styles.surface]}>
+            {
+              dice && currentPlayer === 2 &&
+            
+            <View style={styles.diceHolder}>
+              <View style={[styles.dice, { borderColor: fontColorContrast(theme.colors2) }]}>
+                <Text style={[styles.diceText, { color: fontColorContrast(theme.colors2) }]}>{roll[0]}</Text>
+              </View>
+
+              <View style={[styles.dice, { borderColor: fontColorContrast(theme.colors2) }]}>
+                <Text style={[styles.diceText, { color: fontColorContrast(theme.colors2) }]}>{roll[1]}</Text>
+              </View>
+            </View>
+}
             <Text style={[styles.clock, { color: fontColorContrast(theme.colors2) }]}>{formatTime(player2Time)}</Text>
           </View>
         </Pressable>
@@ -136,6 +175,25 @@ export default ChessClock;
 const styles = StyleSheet.create({
   button: {
     flex: 5,
+  },
+  diceHolder: {
+    flexDirection: "row"
+  },
+  dice: {
+    margin: 10,
+    marginHorizontal: 5,
+    borderWidth: 3,
+    borderRadius: 10,
+    height: 50,
+    width: 50,
+    borderColor: '#fff',
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  diceText: {
+
+    fontFamily: "Helvetica",
+    fontSize: 32,
   },
   middle: {
     backgroundColor: "#111",

@@ -14,7 +14,9 @@ export const ContextProvider = ({ children }) => {
   });
   const [score1, setScore1] = useState(0);
   const [score2, setScore2] = useState(0);
+  const [dice, setDice] = useState(true)
 
+  const [delay, setDelay] = useState(2)
   // Load theme from SecureStore on component mount
   useEffect(() => {
     async function getValueFor(key) {
@@ -48,7 +50,7 @@ export const ContextProvider = ({ children }) => {
 
   // Provide the context value to the components
   return (
-    <Context.Provider value={{ theme, setTheme, score1, setScore1, score2, setScore2 }}>
+    <Context.Provider value={{ dice, setDice, theme, setTheme, score1, setScore1, score2, setScore2 }}>
       {children}
     </Context.Provider>
   );
