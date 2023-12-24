@@ -9,7 +9,7 @@ import fontColorContrast from 'font-color-contrast'
 const ChessClock = ({ navigation }) => {
 
   // Extracting state and functions from custom context
-  const { theme, dice, updateScore, score1, setScore1, setScore2, score2 } = useCustomContext();
+  const { theme, score1, setScore1, setScore2, score2 } = useCustomContext();
 
   // Hook to check if the screen is currently focused
   const isVisible = useIsFocused();
@@ -20,6 +20,7 @@ const ChessClock = ({ navigation }) => {
   const [currentPlayer, setCurrentPlayer] = useState(0);
   const [paused, setPaused] = useState(false);
   const [roll, setRoll] = useState([6, 6])
+  const [delayTime, setDelayTime] = useState(theme.delay)
 
   // Alert game over when either player's time reaches 0
   useEffect(() => {
@@ -33,6 +34,9 @@ const ChessClock = ({ navigation }) => {
     let interval;
     interval = setInterval(() => {
       if (!paused) {
+      setDelayTime(old => old - 1)
+      }
+      if (!paused && delayTime < 1) {
         if (currentPlayer === 1 && player1Time > 0) {
           setPlayer1Time((prevTime) => prevTime - 1);
         }
@@ -44,7 +48,7 @@ const ChessClock = ({ navigation }) => {
     return () => {
       clearInterval(interval);
     };
-  }, [currentPlayer, paused, player1Time, player2Time]);
+  }, [currentPlayer, paused, player1Time, player2Time, delayTime]);
 
   // Function to format time in MM:SS format
   function formatTime(seconds) {
@@ -64,6 +68,7 @@ const ChessClock = ({ navigation }) => {
     const dice2 = getRandomInt(1, 7);
     setRoll([dice1, dice2]);
     setPaused(false)
+    setDelayTime(theme.delay);
     setCurrentPlayer(id)
   }
 
@@ -76,6 +81,8 @@ const ChessClock = ({ navigation }) => {
   useEffect(() => {
     setPlayer1Time(theme.time)
     setPlayer2Time(theme.time)
+    setDelayTime(theme.delay)
+
   }, [isVisible, theme])
 
   // Function to reset the game
@@ -95,7 +102,7 @@ const ChessClock = ({ navigation }) => {
         <Pressable disabled={currentPlayer === 2} onPress={() => currentPlayer == 0 ? togglePlayers(1) : togglePlayers(2)} style={{ flex: 1 }}>
           <View style={[styles.surface]}>
           {
-              dice && currentPlayer === 1 &&
+              theme.diceMode && currentPlayer === 1 &&
              <View style={styles.diceHolder}>
               <View style={[styles.dice, { borderColor: fontColorContrast(theme.colors) }]}>
                 <Text style={[styles.diceText,styles.reverseText, { color: fontColorContrast(theme.colors) }]}>{roll[0]}</Text>
@@ -107,6 +114,10 @@ const ChessClock = ({ navigation }) => {
             </View>
 }
             <Text style={[styles.reverseText, styles.clock, { color: fontColorContrast(theme.colors) }]}>{formatTime(player1Time)}</Text>
+            {
+              delayTime > 0 && currentPlayer === 1 &&
+              <Text style={[styles.diceText, styles.reverseText, { color: fontColorContrast(theme.colors) }]}>{delayTime}</Text>
+            }
           </View>
         </Pressable>
       </View>
@@ -134,7 +145,6 @@ const ChessClock = ({ navigation }) => {
                 :
                 <>
                   <Button style={{ marginLeft: 10 }} onPress={() => navigation.navigate('Settings')} title="Settings" />
-                  <Button style={{ marginLeft: 10 }} onPress={() => resetGame()} title="Reset" />
                 </>
           }
 
@@ -150,7 +160,7 @@ const ChessClock = ({ navigation }) => {
         <Pressable disabled={currentPlayer === 1} onPress={() => currentPlayer == 0 ? togglePlayers(2) : togglePlayers(1)} style={{ flex: 1 }}>
           <View style={[styles.surface]}>
             {
-              dice && currentPlayer === 2 &&
+              theme.diceMode && currentPlayer === 2 &&
             
             <View style={styles.diceHolder}>
               <View style={[styles.dice, { borderColor: fontColorContrast(theme.colors2) }]}>
@@ -163,6 +173,10 @@ const ChessClock = ({ navigation }) => {
             </View>
 }
             <Text style={[styles.clock, { color: fontColorContrast(theme.colors2) }]}>{formatTime(player2Time)}</Text>
+            {
+              delayTime > 0 && currentPlayer === 2 &&
+              <Text style={[styles.diceText, { color: fontColorContrast(theme.colors2) }]}>{delayTime}</Text>
+            }
           </View>
         </Pressable>
       </View>

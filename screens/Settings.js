@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, Modal, StyleSheet, TextInput } from 'react-native';
+import { Text, View, Modal, StyleSheet, TextInput, Switch} from 'react-native';
 import Button from '../components/Button'
 import { PaperProvider } from 'react-native-paper';
 import ColorPicker, { Panel1, Swatches, Preview, OpacitySlider, HueSlider } from 'reanimated-color-picker';
@@ -7,30 +7,28 @@ import { useCustomContext } from '../state/context';
 import fontColorContrast from 'font-color-contrast'
 import * as SecureStore from 'expo-secure-store';
 
-const ChessClock = ({ navigation }) => {
+const ChessClock = () => {
 
   // Custom context for managing theme
   const { theme, setTheme } = useCustomContext();
-
   // State for time input, modals, and saving status
   const [time, setTime] = useState(120);
+  const [delayTime, setDelayTime] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [showModal2, setShowModal2] = useState(false);
   const [saving, setSaving] = useState(false);
-
-  // Function to check if a color represents a light background
-  const isLightBackground = (color) => {
-    // ... implementation details
-  };
-
+  const [diceMode, setDiceMode] = useState(false);
+  const toggleSwitch = () => setDiceMode(previousState => !previousState);
   // Function to save the time to the theme and SecureStore
   const saveTime = async () => {
-    if (isNaN(time)) {
+    if (isNaN(time) || isNaN(delayTime)) {
       alert("Time has to be a number")
       return;
     }
     let newTheme = theme;
     newTheme.time = time;
+    newTheme.delay = delayTime;
+    newTheme.diceMode = diceMode;
     setTheme(newTheme);
     await SecureStore.setItemAsync("theme", JSON.stringify(newTheme));
   };
@@ -53,7 +51,9 @@ const ChessClock = ({ navigation }) => {
   // Load initial time when the component mounts
   useEffect(() => {
     setTime(theme.time);
-  }, []);
+    setDelayTime(theme.delay)
+    setDiceMode(theme.diceMode)
+  }, [theme]);
 
   return (
     <PaperProvider>
@@ -86,10 +86,26 @@ const ChessClock = ({ navigation }) => {
           <Text style={styles.seconds}>Time in seconds: </Text>
           {/* Input for setting time */}
           <TextInput style={styles.input} value={time.toString()} onChangeText={(e) => setTime(e)} label="Set time in seconds" />
-          {/* Button to save time */}
-          <Button title="Save" onPress={saveTime} disable={!saving} />
+          
+         </View>
+        <View style={styles.buttons}>
+       
+        <Text style={styles.seconds}>Delay in seconds: </Text>
+          {/* Input for setting time */}
+          <TextInput style={styles.input} value={delayTime.toString()} onChangeText={(e) => setDelayTime(e)} label="Set delay in seconds" />
+          </View>
+          <View style={styles.buttons}>
+          <Text style={styles.seconds}>Dice mode: </Text>
+          <Switch
+        trackColor={{false: '#767577', true: '#60D838'}}
+        thumbColor={diceMode ? '#f5dd4b' : '#f4f3f4'}
+        ios_backgroundColor="#3e3e3e"
+        onValueChange={toggleSwitch}
+        value={diceMode}
+      />
+    </View>
+    <Button title="Save" onPress={saveTime} disable={!saving} />
         </View>
-      </View>
 
       {/* Player 2 color change button */}
       <View style={[styles.button, { backgroundColor: theme.colors2 }]}>
@@ -121,7 +137,8 @@ const styles = StyleSheet.create({
     flex: 5
   },
   middle: {
-    flex: 1.4,
+    flex: 5,
+    padding: 10,
     justifyContent: "center",
     alignItems: "center"
   },
@@ -159,7 +176,8 @@ const styles = StyleSheet.create({
   buttons: {
     justifyContent: "center",
     alignItems: "center",
-    flexDirection: "row"
+    flexDirection: "row",
+    marginVertical: 10
   },
   seconds: {
     fontSize: 15,
