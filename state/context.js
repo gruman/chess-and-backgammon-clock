@@ -12,7 +12,9 @@ export const ContextProvider = ({ children }) => {
     colors2: "#881100",
     time: 120,
     delay: 2,
-    diceMode: false
+    diceMode: false,
+    haptics: true,
+    decimal: true
   });
   const [score1, setScore1] = useState(0);
   const [score2, setScore2] = useState(0);

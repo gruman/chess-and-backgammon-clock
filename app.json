@@ -2,7 +2,7 @@
   "expo": {
     "name": "chess-clock",
     "slug": "chess-clock",
-    "version": "3.0.0",
+    "version": "3.0.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -16,7 +16,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "buildNumber": "6.0.0"
+      "buildNumber": "7.0.0"
     },
     "android": {
       "adaptiveIcon": {
@@ -24,7 +24,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "co.gruman.chessclock",
-      "versionCode": 6
+      "versionCode": 8
     },
     "web": {
       "favicon": "./assets/favicon.png"

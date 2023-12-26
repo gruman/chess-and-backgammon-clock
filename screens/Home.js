@@ -5,9 +5,21 @@ import { useIsFocused } from "@react-navigation/native";
 import { PaperProvider } from 'react-native-paper';
 import { useCustomContext } from '../state/context';
 import fontColorContrast from 'font-color-contrast'
+import * as Haptics from 'expo-haptics';
+import { FontAwesome5 } from '@expo/vector-icons';
 
 const ChessClock = ({ navigation }) => {
 
+
+const icons = [
+  'dice-one',
+  'dice-two',
+  'dice-three',
+  'dice-four',
+  'dice-five',
+  'dice-six',
+]
+  
   // Extracting state and functions from custom context
   const { theme, score1, setScore1, setScore2, score2 } = useCustomContext();
 
@@ -21,42 +33,66 @@ const ChessClock = ({ navigation }) => {
   const [paused, setPaused] = useState(false);
   const [roll, setRoll] = useState([6, 6])
   const [delayTime, setDelayTime] = useState(theme.delay)
+  const [iconDice, setIconDice] = useState([6, 6])
+
 
   // Alert game over when either player's time reaches 0
   useEffect(() => {
-    if (player1Time === 0 || player2Time === 0) {
-      alert('Game over!');
-    }
-  }, [player1Time, player2Time]);
+    let interval;
 
-  // Timer logic for each player
+    const updateClock = () => {
+      if (!paused && delayTime < 1) {
+        if (currentPlayer === 1 && player1Time > 0) {
+          setPlayer1Time((prevTime) => prevTime - 0.1);
+        } else if (currentPlayer === 2 && player2Time > 0) {
+          setPlayer2Time((prevTime) => prevTime - 0.1);
+        }
+      }
+    };
+
+    interval = setInterval(updateClock, 100);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [currentPlayer, paused, player1Time, player2Time, delayTime]);
+
+
   useEffect(() => {
     let interval;
     interval = setInterval(() => {
       if (!paused) {
       setDelayTime(old => old - 1)
       }
-      if (!paused && delayTime < 1) {
-        if (currentPlayer === 1 && player1Time > 0) {
-          setPlayer1Time((prevTime) => prevTime - 1);
-        }
-        else if (currentPlayer === 2 && player2Time > 0) {
-          setPlayer2Time((prevTime) => prevTime - 1);
-        }
-      }
     }, 1000)
     return () => {
       clearInterval(interval);
     };
-  }, [currentPlayer, paused, player1Time, player2Time, delayTime]);
+  }, [currentPlayer, paused, delayTime]);
 
+  
   // Function to format time in MM:SS format
   function formatTime(seconds) {
     const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    const formattedSeconds = String(remainingSeconds).padStart(2, '0'); // Ensure two-digit formatting
-    return `${minutes}:${formattedSeconds}`;
+    const remainingMilliseconds = Math.round((seconds % 1) * 1000); // Extract rounded milliseconds
+    const formattedSeconds = String(Math.floor(seconds % 60)).padStart(2, '0'); // Ensure two-digit formatting for seconds
+    const tenths = Math.floor(remainingMilliseconds / 100); // Extract rounded hundredths of a second
+    if (theme.decimal) {
+    return (
+      <Text>
+        {minutes}:{formattedSeconds}<Text style={{ fontSize: 30 }}>:{tenths}</Text>
+      </Text>
+    );
+    }
+    else {
+        return (
+          <Text>
+            {minutes}:{formattedSeconds}
+          </Text>
+        )
+    }
   }
+  
   function getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
@@ -66,7 +102,13 @@ const ChessClock = ({ navigation }) => {
   function togglePlayers(id) {
     const dice1 = getRandomInt(1, 7);
     const dice2 = getRandomInt(1, 7);
+    if (theme.haptics) {
+    Haptics.notificationAsync(
+      Haptics.NotificationFeedbackType.Success
+    )
+    }
     setRoll([dice1, dice2]);
+    setIconDice([dice1, dice2]);
     setPaused(false)
     setDelayTime(theme.delay);
     setCurrentPlayer(id)
@@ -104,16 +146,12 @@ const ChessClock = ({ navigation }) => {
           {
               theme.diceMode && currentPlayer === 1 &&
              <View style={styles.diceHolder}>
-              <View style={[styles.dice, { borderColor: fontColorContrast(theme.colors) }]}>
-                <Text style={[styles.diceText,styles.reverseText, { color: fontColorContrast(theme.colors) }]}>{roll[0]}</Text>
-              </View>
-
-              <View style={[styles.dice, { borderColor: fontColorContrast(theme.colors) }]}>
-                 <Text style={[styles.diceText,styles.reverseText, { color: fontColorContrast(theme.colors) }]}>{roll[1]}</Text>
-              </View>
+                <FontAwesome5 style={{margin: 5}} name= {icons[roll[0] - 1]} size={50} color={fontColorContrast(theme.colors)} />
+                <FontAwesome5 style={{margin: 5}} name= {icons[roll[1] - 1]} size={50} color={fontColorContrast(theme.colors)} />
             </View>
-}
-            <Text style={[styles.reverseText, styles.clock, { color: fontColorContrast(theme.colors) }]}>{formatTime(player1Time)}</Text>
+
+          }
+       <Text style={[styles.reverseText, styles.clock, { color: fontColorContrast(theme.colors) }]}>{formatTime(player1Time)}</Text>
             {
               delayTime > 0 && currentPlayer === 1 &&
               <Text style={[styles.diceText, styles.reverseText, { color: fontColorContrast(theme.colors) }]}>{delayTime}</Text>
@@ -163,13 +201,11 @@ const ChessClock = ({ navigation }) => {
               theme.diceMode && currentPlayer === 2 &&
             
             <View style={styles.diceHolder}>
-              <View style={[styles.dice, { borderColor: fontColorContrast(theme.colors2) }]}>
-                <Text style={[styles.diceText, { color: fontColorContrast(theme.colors2) }]}>{roll[0]}</Text>
-              </View>
-
-              <View style={[styles.dice, { borderColor: fontColorContrast(theme.colors2) }]}>
-                <Text style={[styles.diceText, { color: fontColorContrast(theme.colors2) }]}>{roll[1]}</Text>
-              </View>
+                {/* <Text style={[styles.diceText, { color: fontColorContrast(theme.colors2) }]}>{roll[0]}</Text> */}
+                <FontAwesome5 style={{margin: 5}} name= {icons[roll[0] - 1]} size={50} color={fontColorContrast(theme.colors2)} />
+             
+                <FontAwesome5 style={{margin: 5}} name= {icons[roll[1] - 1]} size={50} color={fontColorContrast(theme.colors2)} />
+             
             </View>
 }
             <Text style={[styles.clock, { color: fontColorContrast(theme.colors2) }]}>{formatTime(player2Time)}</Text>
@@ -191,7 +227,12 @@ const styles = StyleSheet.create({
     flex: 5,
   },
   diceHolder: {
-    flexDirection: "row"
+    flexDirection: "row",
+  },
+  middle: {
+    flex: 0.7,
+    width: "100%",
+    backgroundColor: '#111'
   },
   dice: {
     margin: 10,
@@ -208,10 +249,6 @@ const styles = StyleSheet.create({
 
     fontFamily: "Helvetica",
     fontSize: 32,
-  },
-  middle: {
-    backgroundColor: "#111",
-    flex: 0.7,
   },
   score: {
     backgroundColor: "#111",

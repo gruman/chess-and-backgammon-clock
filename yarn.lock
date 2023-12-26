@@ -1974,6 +1974,13 @@
     prompts "^2.4.0"
     semver "^7.5.2"
 
+"@react-native-community/datetimepicker@^7.6.2":
+  version "7.6.2"
+  resolved "https://registry.yarnpkg.com/@react-native-community/datetimepicker/-/datetimepicker-7.6.2.tgz#9bba92dc8088b54331f89bbf89134836f0d4c067"
+  integrity sha512-ogZnvCmNG/lGHhEQypqz/mPymiIWD5jv6uKczg/l/aWgiKs1RDPQH1abh+R0I26aKoXmgamJJPuXKeC5eRWtZg==
+  dependencies:
+    invariant "^2.2.4"
+
 "@react-native/assets-registry@^0.72.0":
   version "0.72.0"
   resolved "https://registry.yarnpkg.com/@react-native/assets-registry/-/assets-registry-0.72.0.tgz#c82a76a1d86ec0c3907be76f7faf97a32bbed05d"
@@ -3340,6 +3347,11 @@ expo-font@~11.4.0:
   dependencies:
     fontfaceobserver "^2.1.0"
 
+expo-haptics@~12.4.0:
+  version "12.4.0"
+  resolved "https://registry.yarnpkg.com/expo-haptics/-/expo-haptics-12.4.0.tgz#99ad9d6a8eafb219aee022ec1412a998e1c90d71"
+  integrity sha512-eELhZOO64oJa6AtEUxosatjSENE/tQgF2rVJxDsvRdx8Vgd3uFC+FRoM3nbMVJkxDgAaP3EKOPT1zVM41sNurw==
+
 expo-keep-awake@~12.3.0:
   version "12.3.0"
   resolved "https://registry.yarnpkg.com/expo-keep-awake/-/expo-keep-awake-12.3.0.tgz#c42449ae19c993274ddc43aafa618792b6aec408"
@@ -4421,6 +4433,11 @@ lodash.debounce@^4.0.8:
   version "4.0.8"
   resolved "https://registry.yarnpkg.com/lodash.debounce/-/lodash.debounce-4.0.8.tgz#82d79bff30a67c4005ffd5e2515300ad9ca4d7af"
   integrity sha512-FT1yDzDYEoYWhnSGnpE/4Kj1fLZkDFyqRb7fNt6FdYOSxlUWAtp42Eh6Wb0rGIv/m9Bgo7x4GhQbm5Ys4SG5ow==
+
+lodash.isequal@^4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/lodash.isequal/-/lodash.isequal-4.5.0.tgz#415c4478f2bcc30120c22ce10ed3226f7d3e18e0"
+  integrity sha512-pDo3lu8Jhfjqls6GkMgpahsF9kCyayhgykjyLMNFTKWrpVdAQtYyB4muAMWozBB4ig/dtWAmsMxLEI8wuz+DYQ==
 
 lodash.throttle@^4.1.1:
   version "4.1.1"
@@ -5661,6 +5678,13 @@ react-native-gesture-handler@~2.12.0:
     lodash "^4.17.21"
     prop-types "^15.7.2"
 
+react-native-modal-datetime-picker@^17.1.0:
+  version "17.1.0"
+  resolved "https://registry.yarnpkg.com/react-native-modal-datetime-picker/-/react-native-modal-datetime-picker-17.1.0.tgz#74291bf92b830be285752f437841f52885c90e0b"
+  integrity sha512-jfTwfaCLtBffYbQ+pOGFLM+J5HmUh3vb9rT0JrrQPjxzecdc8pNYreB1c96+mVuq8bDCvaCdIeuEsslTqLJL0Q==
+  dependencies:
+    prop-types "^15.7.2"
+
 react-native-paper@^5.10.4:
   version "5.10.4"
   resolved "https://registry.yarnpkg.com/react-native-paper/-/react-native-paper-5.10.4.tgz#b96f6af9f2f888ad4addb8914cc36edaac72c3d4"
@@ -5669,6 +5693,13 @@ react-native-paper@^5.10.4:
     "@callstack/react-theme-provider" "^3.0.9"
     color "^3.1.2"
     use-latest-callback "^0.1.5"
+
+react-native-picker-select@^9.0.0:
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/react-native-picker-select/-/react-native-picker-select-9.0.0.tgz#4f9725c5f951d0aedf92cae0da21e40e439a4223"
+  integrity sha512-jkG3gpp2oGMSXSBt5zu76Yp5JNzkF1K8BaKH7erf9Q5oTFI80lozsGMc9FkJokzxuy5+jHRCX+pHHBhtl0SI+A==
+  dependencies:
+    lodash.isequal "^4.5.0"
 
 react-native-reanimated@~3.3.0:
   version "3.3.0"
